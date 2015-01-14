@@ -57,12 +57,12 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <E extends ManagedEntity> E getLinkedEntity(ManagedEntity target, Class<? extends E> type, String... links) {
-        return (E) dao.findOne(type, new QueryBuilder().filter(link).eq(target.getId()).build());
+        return (E) dao.findOne(type, new QueryBuilder().filter(links[0]).eq(target.getId()).build());
     }
 
     @Override
     public <E extends ManagedEntity> List<E> getLinkedEntities(ManagedEntity target, Class<? extends E> type, String... links) {
-        return (List<E>) dao.find(type, new QueryBuilder().filter(link).eq(target.getId()).build());
+        return (List<E>) dao.find(type, new QueryBuilder().filter(links[0]).eq(target.getId()).build());
     }
     
     private ManagedEntity enhance(ManagedEntity entity){
