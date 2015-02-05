@@ -1,10 +1,6 @@
 package biz.devspot.entity.framework.core.mapping.json;
 
 import biz.devspot.entity.framework.core.annotation.AssociatedEntity;
-import biz.devspot.entity.framework.core.annotation.Generated;
-import biz.devspot.entity.framework.core.annotation.LinkedEntities;
-import biz.devspot.entity.framework.core.annotation.LinkedEntity;
-import biz.devspot.entity.framework.core.annotation.ManagedEntity;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
@@ -20,10 +16,6 @@ public class SerialiserAnnotationIntrospector extends NopAnnotationIntrospector 
 
     public SerialiserAnnotationIntrospector() {
         serialisers.put(AssociatedEntity.class, new AssociatedEntitySerialiser());
-        serialisers.put(ManagedEntity.class, new AssociatedEntitySerialiser());
-        serialisers.put(LinkedEntity.class, null);
-        serialisers.put(LinkedEntities.class, null);
-        serialisers.put(Generated.class, null);
     }
 
     @Override

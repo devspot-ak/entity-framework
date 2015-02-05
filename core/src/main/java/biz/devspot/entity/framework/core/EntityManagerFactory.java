@@ -5,6 +5,9 @@ public class EntityManagerFactory {
     private static EntityManager manager;
 
     public static EntityManager getManager() {
+        if(manager == null){
+            throw new EntityManagerNotFoundException();
+        }
         return manager;
     }
 

@@ -1,34 +1,31 @@
 package biz.devspot.entity.framework.test.model;
 
 import biz.devspot.entity.framework.core.EntityManagerFactory;
-import biz.devspot.entity.framework.core.annotation.LinkedEntities;
-import biz.devspot.entity.framework.core.model.AbstractManagedEntity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import biz.devspot.entity.framework.core.model.AbstractIdentifiedDataBackedObject;
+import biz.devspot.entity.framework.core.query.QueryBuilder;
 import java.util.List;
 
-public class Continent<C extends Country> extends AbstractManagedEntity{
-
-    private String name;
-
-    public Continent() {
-    }
+public class Continent<C extends Country> extends AbstractIdentifiedDataBackedObject<ContinentDO>{
 
     public Continent(String name) {
-        this.name = name;
+        data.setName(name);
     }
 
     public String getName() {
-        return name;
+        return data.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        data.setName(name);
     }
     
-    @LinkedEntities
     public List<C> getCountries(){
-        System.out.println("getCountries");
-        return (List<C>) EntityManagerFactory.getManager().getLinkedEntities(this, Country.class, "continent");
+        return (List<C>) EntityManagerFactory.getManager().find(Country.class, new QueryBuilder().where("continent").isEqualTo(getId()).build());
+    }
+
+    @Override
+    protected ContinentDO createDataObject() {
+        return new ContinentDO();
     }
     
 }

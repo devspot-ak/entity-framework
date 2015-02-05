@@ -1,27 +1,27 @@
 package biz.devspot.entity.framework.core;
 
-import biz.devspot.entity.framework.core.model.ManagedEntity;
-import java.util.ArrayList;
-import java.util.List;
+import biz.devspot.entity.framework.core.model.DataBackedObject;
+import java.util.HashSet;
+import java.util.Set;
 
 public class EntityTransaction {
 
-    private final List<ManagedEntity> updated = new ArrayList<ManagedEntity>();
-    private final List<ManagedEntity> deleted = new ArrayList<ManagedEntity>();
+    private final Set<DataBackedObject> updated = new HashSet<DataBackedObject>();
+    private final Set<DataBackedObject> deleted = new HashSet<DataBackedObject>();
 
-    public List<ManagedEntity> getUpdated() {
+    public Set<DataBackedObject> getUpdated() {
         return updated;
     }
 
-    public List<ManagedEntity> getDeleted() {
+    public Set<DataBackedObject> getDeleted() {
         return deleted;
     }
     
-    public void addUpdatedEntity(ManagedEntity entity){
+    public void addUpdatedEntity(DataBackedObject entity){
         updated.add(entity);
     }
     
-    public void addDeletedEntity(ManagedEntity entity){
+    public void addDeletedEntity(DataBackedObject entity){
         deleted.add(entity);
     }
     

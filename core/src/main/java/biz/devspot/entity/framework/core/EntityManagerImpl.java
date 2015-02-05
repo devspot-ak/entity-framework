@@ -1,8 +1,9 @@
 package biz.devspot.entity.framework.core;
 
 import biz.devspot.entity.framework.core.dao.EntityDao;
-import biz.devspot.entity.framework.core.model.ManagedEntity;
-import biz.devspot.entity.framework.core.query.QueryBuilder;
+import biz.devspot.entity.framework.core.model.DataBackedObject;
+import biz.devspot.entity.framework.core.model.DataObject;
+import biz.devspot.entity.framework.core.query.Query;
 import java.util.List;
 import net.sf.cglib.proxy.Enhancer;
 
@@ -17,18 +18,27 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public ManagedEntity manage(ManagedEntity entity) {
-        if (entity.getId() == null) {
-            dao.assignId(entity);
-        }
+    public DataBackedObject manage(DataBackedObject entity) {
+        dao.assignId(entity);
+        DataObject data = DataBackedObjectHandlerFactory.getHandler().getDataObject(entity);
         getTransaction().addUpdatedEntity(entity);
         return enhance(entity);
     }
 
     @Override
-    public ManagedEntity findById(String id) {
-        ManagedEntity result = dao.findById(id);
+    public DataBackedObject findById(String id) {
+        DataBackedObject result = dao.findById(id);
         return result;
+    }
+
+    @Override
+    public <E extends DataBackedObject> E findOne(Class<? extends E> type, Query query) {
+        return dao.findOne(type, query);
+    }
+
+    @Override
+    public <E extends DataBackedObject> List<E> find(Class<? extends E> type, Query query) {
+        return (List<E>) dao.find(type, query);
     }
 
     @Override
@@ -46,37 +56,26 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void commitTransaction() {
-        for (ManagedEntity entity : getTransaction().getUpdated()) {
+        for (DataBackedObject entity : getTransaction().getUpdated()) {
             dao.save(entity);
         }
-        for (ManagedEntity entity : getTransaction().getDeleted()) {
+        for (DataBackedObject entity : getTransaction().getDeleted()) {
             dao.delete(entity);
         }
         context.remove();
     }
 
-    @Override
-    public <E extends ManagedEntity> E getLinkedEntity(ManagedEntity target, Class<? extends E> type, String... links) {
-        return (E) dao.findOne(type, new QueryBuilder().filter(links[0]).eq(target.getId()).build());
-    }
-
-    @Override
-    public <E extends ManagedEntity> List<E> getLinkedEntities(ManagedEntity target, Class<? extends E> type, String... links) {
-        return (List<E>) dao.find(type, new QueryBuilder().filter(links[0]).eq(target.getId()).build());
-    }
-    
-    private ManagedEntity enhance(ManagedEntity entity){
-        return getProxy(entity);
-    }
-
-    private ManagedEntity getProxy(ManagedEntity entity) {
-        if(entity == null){
+    private DataBackedObject enhance(DataBackedObject entity) {
+        DataObject data = DataBackedObjectHandlerFactory.getHandler().getDataObject(entity);
+        if (entity == null) {
             return null;
         }
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(entity.getClass());
+        enhancer.setSuperclass(data.getClass());
         enhancer.setCallback(new BasicEntityMethodInterceptor(entity));
-        return (ManagedEntity) enhancer.create();
+        data = (DataObject) enhancer.create();
+        DataBackedObjectHandlerFactory.getHandler().setDataObject(entity, data);
+        return entity;
     }
 
 }

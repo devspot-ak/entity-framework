@@ -1,21 +1,21 @@
 package biz.devspot.entity.framework.core.dao;
 
-import biz.devspot.entity.framework.core.model.ManagedEntity;
+import biz.devspot.entity.framework.core.model.DataBackedObject;
 import biz.devspot.entity.framework.core.query.Query;
 import java.util.List;
 
 public interface EntityDao {
-
-    public void assignId(ManagedEntity entity) throws DaoException;
     
-    public void save(ManagedEntity entity) throws DaoException;
+    public void assignId(DataBackedObject data);
     
-    public void delete(ManagedEntity entity) throws DaoException;
+    public void save(DataBackedObject entity) throws DaoException;
     
-    public ManagedEntity findById(String id) throws DaoException;
+    public void delete(DataBackedObject entity) throws DaoException;
     
-    public <E extends ManagedEntity> E findOne(Class<E> type, Query query) throws DaoException;
+    public DataBackedObject findById(String id) throws DaoException;
     
-    public <E extends ManagedEntity> List<E> find(Class<E> type, Query query) throws DaoException;
+    public <E extends DataBackedObject> E findOne(Class<E> type, Query query) throws DaoException;
+    
+    public <E extends DataBackedObject> List<E> find(Class<E> type, Query query) throws DaoException;
     
 }

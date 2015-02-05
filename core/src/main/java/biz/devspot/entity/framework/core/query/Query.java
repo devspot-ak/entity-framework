@@ -1,19 +1,20 @@
 package biz.devspot.entity.framework.core.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Query {
 
-    private List<QueryFilter> filters = new ArrayList<QueryFilter>();
+    private QueryFilter filter;
     private int limit = -1;
+    private Set<QuerySortField> sortFields = new HashSet<QuerySortField>();
 
-    public List<QueryFilter> getFilters() {
-        return filters;
+    public QueryFilter getFilter() {
+        return filter;
     }
 
-    public void setFilters(List<QueryFilter> filters) {
-        this.filters = filters;
+    public void setFilter(QueryFilter filter) {
+        this.filter = filter;
     }
 
     public int getLimit() {
@@ -23,5 +24,13 @@ public class Query {
     public void setLimit(int limit) {
         this.limit = limit;
     }
-    
+
+    public Set<QuerySortField> getSortFields() {
+        return sortFields;
+    }
+
+    public void setSortFields(Set<QuerySortField> sortFields) {
+        this.sortFields = sortFields;
+    }
+
 }

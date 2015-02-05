@@ -1,10 +1,10 @@
 package biz.devspot.entity.framework.core.mapping.json;
 
-import biz.devspot.entity.framework.test.model.Continent;
-import biz.devspot.entity.framework.test.model.Country;
+import biz.devspot.entity.framework.core.DataBackedObjectHandlerFactory;
 import biz.devspot.entity.framework.core.EntityManager;
 import biz.devspot.entity.framework.core.EntityManagerFactory;
-import biz.devspot.entity.framework.test.model.World;
+import biz.devspot.entity.framework.test.model.Continent;
+import biz.devspot.entity.framework.test.model.Country;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import org.easymock.EasyMock;
@@ -19,9 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class JsonObjectMapperTest {
+public class DataBackedObjectMapperTest {
 
-    public JsonObjectMapperTest() {
+    public DataBackedObjectMapperTest() {
     }
 
     @BeforeClass
@@ -42,30 +42,27 @@ public class JsonObjectMapperTest {
 
     @Test
     public void testSerialise() throws JsonProcessingException {
-        EntityObjectMapper objectMapper = new EntityObjectMapper();
+        DataBackedObjectMapper objectMapper = new DataBackedObjectMapper();
         Continent continent = new Continent("Test Continent");
-        continent.setId("123");
+        DataBackedObjectHandlerFactory.getHandler().getDataObject(continent).setId("123");
         Country country = new Country("Test Country", continent);
+        DataBackedObjectHandlerFactory.getHandler().getDataObject(country).setId("456");
         String result = objectMapper.writeValueAsString(country);
         System.out.println("result = " + result);
         JSONObject json = new JSONObject(result);
-        assertEquals("123", json.getString("continent"));
-        result = objectMapper.writeValueAsString(continent);
-        System.out.println("result = " + result);
-        json = new JSONObject(result);
-        assertEquals("123", json.getString("id"));
+        assertEquals("456", json.getString("id"));
+        assertEquals("123", json.getString("continent"));        
     }
 
     @Test
     public void testDeserialise() throws JsonProcessingException, IOException {
-        EntityObjectMapper objectMapper = new EntityObjectMapper();
+        DataBackedObjectMapper objectMapper = new DataBackedObjectMapper();
         JSONObject json = new JSONObject();
         json.put("id", "123");
         json.put("name", "Test Country");
         json.put("continent", "456");
         json.put("cities", new JSONArray("[{'name': 'Test City', 'country': '123'}]"));
         Continent continent = new Continent("Test Continent");
-        continent.setId("456");
         Country country = objectMapper.readValue(json.toString(), Country.class);
         assertEquals("123", country.getId());
         assertEquals("Test Country", country.getName());
@@ -74,30 +71,9 @@ public class JsonObjectMapperTest {
         EntityManagerFactory.setManager(mockEntityService);
         expect(mockEntityService.findById("456")).andReturn(continent);
         mocksControl.replay();
-        assertEquals("456", country.getContinent().getId());
+        assertNotNull(country.getContinent());
         mocksControl.verify();
         assertEquals("Test City", country.getCities().get(0).getName());
-    }
-    
-    @Test
-    public void testWrapperObject() throws Exception{
-        EntityObjectMapper objectMapper = new EntityObjectMapper();
-        Continent continent = new Continent("Test Continent");
-        continent.setId("123");
-        World world = new World();
-        world.setContinent(continent);
-        String result = objectMapper.writeValueAsString(world);
-        System.out.println("result = " + result);
-        JSONObject json = new JSONObject(result);
-        assertEquals("123", json.getString("continent"));
-        IMocksControl mocksControl = EasyMock.createControl();
-        EntityManager mockEntityService = mocksControl.createMock(EntityManager.class);
-        EntityManagerFactory.setManager(mockEntityService);
-        expect(mockEntityService.findById("123")).andReturn(continent);
-        mocksControl.replay();
-        world = objectMapper.readValue(result, World.class);
-        assertEquals(continent, world.getContinent());
-        mocksControl.verify();
     }
 
 }

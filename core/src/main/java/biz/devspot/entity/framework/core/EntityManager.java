@@ -1,13 +1,18 @@
 package biz.devspot.entity.framework.core;
 
-import biz.devspot.entity.framework.core.model.ManagedEntity;
+import biz.devspot.entity.framework.core.model.DataBackedObject;
+import biz.devspot.entity.framework.core.query.Query;
 import java.util.List;
 
 public interface EntityManager {
     
-    public ManagedEntity manage(ManagedEntity entity);
+    public DataBackedObject manage(DataBackedObject entity);
     
-    public ManagedEntity findById(String id);
+    public DataBackedObject findById(String id);
+    
+    public <E extends DataBackedObject> E findOne(Class<? extends E> type, Query query);
+    
+    public <E extends DataBackedObject> List<E> find(Class<? extends E> type, Query query);
     
     public void openTransaction();
     
@@ -15,7 +20,4 @@ public interface EntityManager {
     
     public void commitTransaction();
     
-    public <E extends ManagedEntity> E getLinkedEntity(ManagedEntity target, Class<? extends E> type, String... links);
-    
-    public <E extends ManagedEntity> List<E> getLinkedEntities(ManagedEntity target, Class<? extends E> type, String... links);
 }

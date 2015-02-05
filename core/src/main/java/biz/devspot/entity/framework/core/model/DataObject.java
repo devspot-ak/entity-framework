@@ -1,6 +1,6 @@
 package biz.devspot.entity.framework.core.model;
 
-public interface ManagedEntity {
+public interface DataObject {
 
     public String getId();
     

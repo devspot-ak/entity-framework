@@ -1,11 +1,10 @@
-
 package biz.devspot.entity.framework.core.model;
 
 import biz.devspot.entity.framework.core.EntityManager;
 import biz.devspot.entity.framework.core.EntityManagerFactory;
 import biz.devspot.entity.framework.core.EntityManagerImpl;
 import biz.devspot.entity.framework.core.dao.mongo.MongoDao;
-import biz.devspot.entity.framework.core.mapping.json.EntityObjectMapper;
+import biz.devspot.entity.framework.core.mapping.json.DataBackedObjectMapper;
 import biz.devspot.entity.framework.test.model.City;
 import biz.devspot.entity.framework.test.model.Continent;
 import biz.devspot.entity.framework.test.model.Country;
@@ -21,9 +20,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class ManagedEntityTest {
+public class DataBackedObjectTest {
 
-    public ManagedEntityTest() {
+    public DataBackedObjectTest() {
     }
 
     @BeforeClass
@@ -34,10 +33,13 @@ public class ManagedEntityTest {
     public static void tearDownClass() {
     }
 
+    private MongoDao dao;
+    
     @Before
     public void setUp() {
         MongoClient mongo = new Fongo("Test Server").getMongo();
-        EntityManager manager = new EntityManagerImpl(new MongoDao(mongo.getDB("test"), new EntityObjectMapper()));
+        dao = new MongoDao(mongo.getDB("test"), new DataBackedObjectMapper());
+        EntityManager manager = new EntityManagerImpl(dao);
         EntityManagerFactory.setManager(manager);
     }
 
@@ -64,7 +66,7 @@ public class ManagedEntityTest {
         assertEquals(1, continent.getCountries().size());
         assertEquals(country.getId(), continent.getCountries().get(0).getId());
     }
-    
+
     @Test
     public void testExtended() {
         EntityManager manager = EntityManagerFactory.getManager();
@@ -79,7 +81,7 @@ public class ManagedEntityTest {
         assertEquals(1, continent.getCountries().size());
         assertEquals(country.getId(), continent.getCountries().get(0).getId());
     }
-    
+
     @Test
     public void testUpdate() {
         EntityManager manager = EntityManagerFactory.getManager();
@@ -101,8 +103,14 @@ public class ManagedEntityTest {
         manager.commitTransaction();
         result = (Continent) manager.findById(continent.getId());
         assertEquals("Other Country", result.getCountries().get(0).getName());
+        dao.clearObjectCache();
+        country = (Country) manager.findById(country.getId());
+        manager.openTransaction();
+        country.setContinent(null);
+        manager.commitTransaction();
+        assertEquals(null, country.getContinent());
     }
-    
+
     @Test
     public void testUpdateExtended() {
         EntityManager manager = EntityManagerFactory.getManager();

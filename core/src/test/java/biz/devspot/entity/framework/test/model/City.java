@@ -1,36 +1,25 @@
 package biz.devspot.entity.framework.test.model;
 
-import biz.devspot.entity.framework.core.annotation.AssociatedEntity;
-import biz.devspot.entity.framework.core.model.AbstractManagedEntity;
+import biz.devspot.entity.framework.core.model.AbstractIdentifiedDataBackedObject;
 
-public class City extends AbstractManagedEntity{
-
-    private String name;
-    @AssociatedEntity
-    private Country country;
-
-    public City() {
-    }
-
+public class City extends AbstractIdentifiedDataBackedObject<CityDO>{
+    
     public City(String name, Country country) {
-        this.name = name;
-        this.country = country;
+        data.setName(name);
+        data.setCountry(country);
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return data.getName();
     }
 
     public Country getCountry() {
-        return country;
+        return data.getCountry();
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    @Override
+    protected CityDO createDataObject() {
+        return new CityDO();
     }
     
 }

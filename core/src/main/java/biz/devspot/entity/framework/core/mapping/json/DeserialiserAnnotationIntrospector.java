@@ -1,7 +1,6 @@
 package biz.devspot.entity.framework.core.mapping.json;
 
 import biz.devspot.entity.framework.core.annotation.AssociatedEntity;
-import biz.devspot.entity.framework.core.annotation.ManagedEntity;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
@@ -16,7 +15,6 @@ public class DeserialiserAnnotationIntrospector extends NopAnnotationIntrospecto
     private Map<Class, JsonDeserializer> deserialisers = new HashMap<Class, JsonDeserializer>();
 
     public DeserialiserAnnotationIntrospector() {
-        deserialisers.put(ManagedEntity.class, new EntityLinkDeserialiser());
         deserialisers.put(AssociatedEntity.class, null);
     }
 
