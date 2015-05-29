@@ -29,11 +29,6 @@
             <version>20140107</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.cqengine</groupId>
-            <artifactId>cqengine</artifactId>
-            <version>1.2.7</version>
-        </dependency>
-        <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>3.1</version>

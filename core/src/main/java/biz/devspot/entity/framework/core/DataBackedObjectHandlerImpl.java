@@ -28,10 +28,13 @@ public class DataBackedObjectHandlerImpl implements DataBackedObjectHandler {
 
     @Override
     public Class<? extends DataObject> getDataObjectType(Class<? extends DataBackedObject> objectClass) {
+        System.out.println(objectClass.getName());
         Field field = FieldUtils.getField(objectClass, "data", true);
+        System.out.println("field = " + field);
         if (field == null) {
             throw new IllegalStateException("Couldn't find data object for entity");
         }
+        System.out.println(ReflectionUtils.getFieldType(objectClass, field));
         Class<? extends DataObject> type = (Class<? extends DataObject>) ReflectionUtils.getFieldType(objectClass, field);
         return type;
     }

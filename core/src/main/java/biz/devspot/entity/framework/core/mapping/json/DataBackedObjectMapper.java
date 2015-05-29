@@ -1,7 +1,7 @@
 package biz.devspot.entity.framework.core.mapping.json;
 
 import biz.devspot.entity.framework.core.model.DataBackedObject;
-import biz.devspot.entity.framework.core.model.DataObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -21,13 +21,13 @@ public class DataBackedObjectMapper extends ObjectMapper {
         //module.setDeserializers(new EntityDeserialisers());
         module.setSerializerModifier(new BeanSerializerModifier() {
             
-            private DataBackedObjectSerialiser serialiser = new DataBackedObjectSerialiser();
+            private DataBackedObjectSerialiser dataBackedObjectSerialiser = new DataBackedObjectSerialiser();
             
             @Override
             public JsonSerializer<?> modifySerializer(SerializationConfig sc, BeanDescription bd, JsonSerializer<?> js) {
                 Class type = bd.getBeanClass();
                 if (DataBackedObject.class.isAssignableFrom(type)) {
-                    return serialiser;
+                    return dataBackedObjectSerialiser;
                 }
                 return super.modifySerializer(sc, bd, js);
             }
@@ -52,7 +52,6 @@ public class DataBackedObjectMapper extends ObjectMapper {
 
         });
         registerModule(module);
-        setAnnotationIntrospectors(com.fasterxml.jackson.databind.AnnotationIntrospector.pair(new SerialiserAnnotationIntrospector(), DEFAULT_ANNOTATION_INTROSPECTOR), com.fasterxml.jackson.databind.AnnotationIntrospector.pair(new DeserialiserAnnotationIntrospector(), DEFAULT_ANNOTATION_INTROSPECTOR));
     }
 
 }

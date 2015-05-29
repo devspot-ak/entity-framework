@@ -37,6 +37,9 @@ public class ReflectionUtilsTest {
         Field field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field1", true);
         Type result = ReflectionUtils.getFieldType(clazz, field);
         assertEquals(String.class, result);
+        field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field2", true);
+        result = ReflectionUtils.getFieldType(clazz, field);
+        assertEquals(Object.class, result);
         clazz = FieldUtilsTestClass2.class;
         field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field2", true);
         result = ReflectionUtils.getFieldType(clazz, field);
@@ -45,9 +48,19 @@ public class ReflectionUtilsTest {
         field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field2", true);
         result = ReflectionUtils.getFieldType(clazz, field);
         assertEquals(String.class, result);
+        System.out.println("==================================");
+        clazz = FieldUtilsTestClass4.class;
+        field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field2", true);
+        result = ReflectionUtils.getFieldType(clazz, field);
+        assertEquals(Number.class, result);
+        System.out.println("==================================");
+        clazz = FieldUtilsTestClass5.class;
+        field = org.apache.commons.lang3.reflect.FieldUtils.getField(clazz, "field2", true);
+        result = ReflectionUtils.getFieldType(clazz, field);
+        assertEquals(Integer.class, result);
     }
     
-    public class FieldUtilsTestClass1<F>{
+    public class FieldUtilsTestClass1<F extends Object>{
         
         private String field1;
         private F field2;
@@ -59,6 +72,14 @@ public class ReflectionUtilsTest {
     }
     
     public class FieldUtilsTestClass3 extends FieldUtilsTestClass2{
+        
+    }
+    
+    public class FieldUtilsTestClass4<N extends Number> extends FieldUtilsTestClass1<N>{
+        
+    }
+    
+    public class FieldUtilsTestClass5 extends FieldUtilsTestClass4<Integer>{
         
     }
 

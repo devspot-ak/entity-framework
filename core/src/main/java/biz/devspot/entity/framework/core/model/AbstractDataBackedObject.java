@@ -1,11 +1,14 @@
 package biz.devspot.entity.framework.core.model;
 
+import biz.devspot.entity.framework.core.EntityManagerFactory;
+
 public abstract class AbstractDataBackedObject<DO extends DataObject> implements DataBackedObject{
 
     protected DO data;
 
     public AbstractDataBackedObject() {
         this.data = createDataObject();
+        EntityManagerFactory.getManager().manage(this);
     }
 
     protected abstract DO createDataObject();

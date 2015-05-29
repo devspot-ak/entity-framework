@@ -3,9 +3,14 @@ package biz.devspot.entity.framework.core.mapping.json;
 import biz.devspot.entity.framework.core.DataBackedObjectHandlerFactory;
 import biz.devspot.entity.framework.core.EntityManager;
 import biz.devspot.entity.framework.core.EntityManagerFactory;
+import biz.devspot.entity.framework.core.EntityManagerImpl;
+import biz.devspot.entity.framework.core.dao.EntityDao;
+import biz.devspot.entity.framework.core.dao.mongo.MongoDao;
 import biz.devspot.entity.framework.test.model.Continent;
 import biz.devspot.entity.framework.test.model.Country;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fakemongo.Fongo;
+import com.mongodb.MongoClient;
 import java.io.IOException;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expect;
@@ -21,6 +26,8 @@ import static org.junit.Assert.*;
 
 public class DataBackedObjectMapperTest {
 
+    private EntityManager manager;
+    
     public DataBackedObjectMapperTest() {
     }
 
@@ -34,6 +41,10 @@ public class DataBackedObjectMapperTest {
 
     @Before
     public void setUp() {
+        MongoClient mongo = new Fongo("Test Server").getMongo();
+        EntityDao dao = new MongoDao(mongo.getDB("test"), new DataBackedObjectMapper());
+        manager = new EntityManagerImpl(dao);
+        EntityManagerFactory.setManager(manager);
     }
 
     @After
@@ -42,6 +53,7 @@ public class DataBackedObjectMapperTest {
 
     @Test
     public void testSerialise() throws JsonProcessingException {
+        manager.openTransaction();
         DataBackedObjectMapper objectMapper = new DataBackedObjectMapper();
         Continent continent = new Continent("Test Continent");
         DataBackedObjectHandlerFactory.getHandler().getDataObject(continent).setId("123");
@@ -56,12 +68,12 @@ public class DataBackedObjectMapperTest {
 
     @Test
     public void testDeserialise() throws JsonProcessingException, IOException {
+        manager.openTransaction();
         DataBackedObjectMapper objectMapper = new DataBackedObjectMapper();
         JSONObject json = new JSONObject();
         json.put("id", "123");
         json.put("name", "Test Country");
         json.put("continent", "456");
-        json.put("cities", new JSONArray("[{'name': 'Test City', 'country': '123'}]"));
         Continent continent = new Continent("Test Continent");
         Country country = objectMapper.readValue(json.toString(), Country.class);
         assertEquals("123", country.getId());
@@ -73,7 +85,6 @@ public class DataBackedObjectMapperTest {
         mocksControl.replay();
         assertNotNull(country.getContinent());
         mocksControl.verify();
-        assertEquals("Test City", country.getCities().get(0).getName());
     }
 
 }

@@ -1,7 +1,6 @@
 package biz.devspot.entity.framework.core.mapping.json;
 
 import biz.devspot.entity.framework.core.DataBackedObjectHandlerFactory;
-import biz.devspot.entity.framework.core.EntityManagerFactory;
 import biz.devspot.entity.framework.core.EntityMethodInterceptor;
 import biz.devspot.entity.framework.core.model.DataBackedObject;
 import biz.devspot.entity.framework.core.model.DataObject;
@@ -13,9 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import net.sf.cglib.proxy.Enhancer;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -40,6 +37,9 @@ public class DataBackedObjectDeserialiser extends JsonDeserializer<DataBackedObj
     @Override
     public DataBackedObject deserialize(JsonParser jp, DeserializationContext dc) throws IOException, JsonProcessingException {
         String json = jp.getCodec().readTree(jp).toString();
+        if(json.indexOf("{")!=0){
+            return null;
+        }
         ObjectMapper objectMapper = (ObjectMapper) jp.getCodec();
         DataObject data = objectMapper.reader(dataType).readValue(json);
         DataBackedObject object = (DataBackedObject) objectInstantiator.newInstance();
@@ -50,7 +50,7 @@ public class DataBackedObjectDeserialiser extends JsonDeserializer<DataBackedObj
 
     @Override
     public void resolve(DeserializationContext dc) throws JsonMappingException {
-        ((ResolvableDeserializer) defaultDeserialiser).resolve(dc);
+        //((ResolvableDeserializer) defaultDeserialiser).resolve(dc);
     }
 
     private DataObject enhance(DataBackedObject object, DataObject data, JSONObject metadata) {

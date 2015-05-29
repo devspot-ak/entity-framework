@@ -31,7 +31,8 @@ public class MongoDao extends AbstractDao {
         this.objectMapper = objectMapper;
     }
     
-    public void clearObjectCache(){
+    @Override
+    public void clearCache(){
         objectCache.clear();
     }
 

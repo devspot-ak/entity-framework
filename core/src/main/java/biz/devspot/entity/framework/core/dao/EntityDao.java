@@ -8,6 +8,8 @@ public interface EntityDao {
     
     public void assignId(DataBackedObject data);
     
+    public void clearCache();
+    
     public void save(DataBackedObject entity) throws DaoException;
     
     public void delete(DataBackedObject entity) throws DaoException;

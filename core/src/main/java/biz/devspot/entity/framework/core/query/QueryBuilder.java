@@ -21,23 +21,36 @@ public class QueryBuilder {
     }
 
     public QueryBuilder isEqualTo(Object value) {
+        setFilter(new EqualityFilter(filterField, value));
+        return this;
+    }
+
+    public QueryBuilder isGreaterThan(Object value) {
+        setFilter(new GreaterThanFilter(filterField, value));
+        return this;
+    }
+    
+    public QueryBuilder isLessThan(Object value) {
+        setFilter(new LessThanFilter(filterField, value));
+        return this;
+    }
+
+    private void setFilter(QueryFilter newFilter) {
         if (filterField == null) {
             throw new IllegalStateException("Conditional field not set");
         }
-        QueryFilter newFilter = new EqualityFilter(filterField, value);
-        if(filterOperand.equals("start")){
+        if (filterOperand.equals("start")) {
             filter = newFilter;
             query.setFilter(filter);
-        }else if(filterOperand.equals("and")){
+        } else if (filterOperand.equals("and")) {
             filter.setAndFilter(newFilter);
             filter = newFilter;
-        }else if(filterOperand.equals("or")){
+        } else if (filterOperand.equals("or")) {
             filter.setOrFilter(newFilter);
             filter = newFilter;
-        }else{
+        } else {
             throw new IllegalStateException("Unknown filter operand " + filterOperand);
         }
-        return this;
     }
 
     public QueryBuilder and(String field) {
@@ -49,28 +62,28 @@ public class QueryBuilder {
         applyOperand("or", field);
         return this;
     }
-    
-    public QueryBuilder limit(int limit){
+
+    public QueryBuilder limit(int limit) {
         query.setLimit(limit);
         return this;
     }
-    
-    public QueryBuilder sortBy(String field){
+
+    public QueryBuilder sortBy(String field) {
         sortField = new QuerySortField(field);
         query.getSortFields().add(sortField);
         return this;
     }
-    
-    public QueryBuilder ascending(){
-        if(sortField==null){
+
+    public QueryBuilder ascending() {
+        if (sortField == null) {
             throw new IllegalStateException("Sort field not set");
         }
         sortField.setDirection(QuerySortDirection.ASCENDING);
         return this;
     }
-    
-    public QueryBuilder descending(){
-        if(sortField==null){
+
+    public QueryBuilder descending() {
+        if (sortField == null) {
             throw new IllegalStateException("Sort field not set");
         }
         sortField.setDirection(QuerySortDirection.DESCENDING);

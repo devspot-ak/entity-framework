@@ -1,6 +1,5 @@
 package biz.devspot.entity.framework.core;
 
-import biz.devspot.entity.framework.core.annotation.AssociatedEntity;
 import biz.devspot.entity.framework.core.model.DataBackedObject;
 import biz.devspot.entity.framework.core.model.DataObject;
 import java.lang.reflect.Field;
@@ -30,7 +29,7 @@ public class EntityMethodInterceptor implements MethodInterceptor {
         if (method.getReturnType().equals(Void.TYPE)) {
             EntityManagerFactory.getManager().getTransaction().addUpdatedEntity(object);
             if (method.getName().startsWith("set")) {
-                if (hasAssociatedEntityAnnotation(method)) {
+                if (isAssociatedEntity(method)) {
                     String fieldName = method.getName().substring(3);
                     fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
                     DataBackedObject assocEntity = (DataBackedObject) args[0];
@@ -44,7 +43,7 @@ public class EntityMethodInterceptor implements MethodInterceptor {
             }
         } else {
             if (result == null && method.getName().startsWith("get")) {
-                if (hasAssociatedEntityAnnotation(method)) {
+                if (isAssociatedEntity(method)) {
                     String fieldName = method.getName().substring(3);
                     fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
                     String assocEntityId = metadata.optString(fieldName, null);
@@ -60,17 +59,15 @@ public class EntityMethodInterceptor implements MethodInterceptor {
         return result;
     }
 
-    private boolean hasAssociatedEntityAnnotation(Method method) {
+    private boolean isAssociatedEntity(Method method) {
         String fieldName = method.getName().substring(3);
-        AssociatedEntity annotation = method.getAnnotation(AssociatedEntity.class);
-        if (annotation == null) {
-            fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
-            Field field = FieldUtils.getField(data.getClass(), fieldName, true);
-            if (field != null) {
-                annotation = field.getAnnotation(AssociatedEntity.class);
-            }
+        fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
+        Field field = FieldUtils.getField(data.getClass(), fieldName, true);
+        if (field != null) {
+            return DataBackedObject.class.isAssignableFrom(field.getType());
+        }else{
+            return false;
         }
-        return annotation != null;
     }
 
 }

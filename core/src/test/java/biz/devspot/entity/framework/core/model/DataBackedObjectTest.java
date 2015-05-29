@@ -5,14 +5,11 @@ import biz.devspot.entity.framework.core.EntityManagerFactory;
 import biz.devspot.entity.framework.core.EntityManagerImpl;
 import biz.devspot.entity.framework.core.dao.mongo.MongoDao;
 import biz.devspot.entity.framework.core.mapping.json.DataBackedObjectMapper;
-import biz.devspot.entity.framework.test.model.City;
 import biz.devspot.entity.framework.test.model.Continent;
 import biz.devspot.entity.framework.test.model.Country;
 import biz.devspot.entity.framework.test.model.CountryExtended;
 import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,13 +49,7 @@ public class DataBackedObjectTest {
         EntityManager manager = EntityManagerFactory.getManager();
         manager.openTransaction();
         Continent<Country> continent = new Continent("Test Continent");
-        manager.manage(continent);
         Country country = new Country("Test Country", continent);
-        manager.manage(country);
-        City city = new City("Test City", country);
-        List<City> cities = new ArrayList<City>();
-        cities.add(city);
-        country.setCities(cities);
         manager.commitTransaction();
         assertTrue(continent.getId().startsWith(Continent.class.getName() + "_"));
         Continent result = (Continent) manager.findById(continent.getId());
@@ -72,9 +63,7 @@ public class DataBackedObjectTest {
         EntityManager manager = EntityManagerFactory.getManager();
         manager.openTransaction();
         Continent<CountryExtended> continent = new Continent("Test Continent");
-        manager.manage(continent);
         Country country = new CountryExtended("Test Country", continent);
-        manager.manage(country);
         manager.commitTransaction();
         assertTrue(continent.getId().startsWith(Continent.class.getName() + "_"));
         assertTrue(country.getId().startsWith(CountryExtended.class.getName() + "_"));
@@ -87,9 +76,7 @@ public class DataBackedObjectTest {
         EntityManager manager = EntityManagerFactory.getManager();
         manager.openTransaction();
         Continent<Country> continent = new Continent("Test Continent");
-        manager.manage(continent);
         Country country = new Country("Test Country", continent);
-        manager.manage(country);
         manager.commitTransaction();
         Continent<Country> result = (Continent) manager.findById(continent.getId());
         assertEquals("Test Continent", result.getName());
@@ -103,12 +90,29 @@ public class DataBackedObjectTest {
         manager.commitTransaction();
         result = (Continent) manager.findById(continent.getId());
         assertEquals("Other Country", result.getCountries().get(0).getName());
-        dao.clearObjectCache();
+        dao.clearCache();
         country = (Country) manager.findById(country.getId());
         manager.openTransaction();
         country.setContinent(null);
         manager.commitTransaction();
         assertEquals(null, country.getContinent());
+    }
+    
+    @Test
+    public void testUpdate2() {
+        EntityManager manager = EntityManagerFactory.getManager();
+        manager.openTransaction();
+        Continent<Country> continent = new Continent("Test Continent");
+        Country country = new Country("Test Country", null);
+        manager.commitTransaction();
+        assertEquals(null, country.getContinent());
+        dao.clearCache();
+        country = (Country) manager.findById(country.getId());
+        assertEquals(null, country.getContinent());
+        manager.openTransaction();
+        country.setContinent(continent);
+        manager.commitTransaction();
+        assertEquals(continent, country.getContinent());
     }
 
     @Test
@@ -116,9 +120,7 @@ public class DataBackedObjectTest {
         EntityManager manager = EntityManagerFactory.getManager();
         manager.openTransaction();
         Continent<Country> continent = new Continent("Test Continent");
-        manager.manage(continent);
         Country country = new CountryExtended("Test Country", continent);
-        manager.manage(country);
         manager.commitTransaction();
         Continent<Country> result = (Continent) manager.findById(continent.getId());
         assertEquals("Test Continent", result.getName());

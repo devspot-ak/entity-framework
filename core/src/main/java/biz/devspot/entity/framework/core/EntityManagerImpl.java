@@ -18,11 +18,15 @@ public class EntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public DataBackedObject manage(DataBackedObject entity) {
+    public void clearCache() {
+        dao.clearCache();
+    }
+
+    @Override
+    public void manage(DataBackedObject entity) {
         dao.assignId(entity);
         DataObject data = DataBackedObjectHandlerFactory.getHandler().getDataObject(entity);
         getTransaction().addUpdatedEntity(entity);
-        return enhance(entity);
     }
 
     @Override

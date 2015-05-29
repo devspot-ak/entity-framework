@@ -26,14 +26,6 @@ public class Country extends AbstractIdentifiedDataBackedObject<CountryDO> {
         data.setContinent(continent);
     }
 
-    public List<City> getCities() {
-        return data.getCities();
-    }
-
-    public void setCities(List<City> cities) {
-        data.setCities(cities);
-    }
-
     @Override
     protected CountryDO createDataObject() {
         return new CountryDO();
